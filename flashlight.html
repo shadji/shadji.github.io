@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashlight Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>iOS Flashlight Demo</h1>
+    <video id="video" autoplay playsinline></video>
+    <br>
+    <button id="startButton">Start Back Camera with Flashlight</button>
+    <button id="stopButton">Stop Camera</button>
+
+    <script>
+        let stream;
+
+        // Start the back camera with flashlight
+        async function startBackCameraWithFlashlight() {
+            try {
+                // Request the back camera stream
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { exact: 'environment' } }
+                });
+
+                // Get the video track from the stream
+                const videoTrack = stream.getVideoTracks()[0];
+
+                // Attach the stream to the video element
+                const videoElement = document.getElementById('video');
+                videoElement.srcObject = stream;
+
+                // Check if the device supports torch mode
+                const capabilities = videoTrack.getCapabilities();
+                if (capabilities.torch) {
+                    // Enable the flashlight
+                    await videoTrack.applyConstraints({ advanced: [{ torch: true }] });
+                } else {
+                    alert('Flashlight is not supported on this device.');
+                }
+            } catch (error) {
+                console.error('Error accessing back camera or enabling flashlight:', error);
+                alert('Could not access the back camera or flashlight.');
+            }
+        }
+
+        // Stop the camera and turn off the flashlight
+        function stopBackCamera() {
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        // Attach event listeners to buttons
+        document.getElementById('startButton').addEventListener('click', startBackCameraWithFlashlight);
+        document.getElementById('stopButton').addEventListener('click', stopBackCamera);
+    </script>
+</body>
+</html>
