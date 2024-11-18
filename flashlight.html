@@ -38,7 +38,10 @@
             try {
                 // Request the back camera stream
                 stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { exact: 'environment' } }
+                    video: { facingMode: { exact: 'environment' }, 
+                            width: { exact: 3024 },
+                            height: { exact: 4032 }
+                      }
                 });
 
                 // Get the video track from the stream
